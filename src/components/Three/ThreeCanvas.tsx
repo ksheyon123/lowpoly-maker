@@ -7,7 +7,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const ThreeCanvas: React.FC = () => {
     const mountRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
+    useEffect(() => { 
         // Scene, Camera, Renderer
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -25,7 +25,7 @@ const ThreeCanvas: React.FC = () => {
         //     Math.random() * 10,
         //     Math.random() * 10,
         //     Math.random() * 10
-        // ));s
+        // ));
 
         const points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1), new THREE.Vector3(2, 0, 0), new THREE.Vector3(3, 1, 1), new THREE.Vector3(4, 0, 0), new THREE.Vector3(4, 0, 1) ]
         // Convex Hull 알고리즘을 위한 QuickHull 사용
@@ -41,6 +41,16 @@ const ThreeCanvas: React.FC = () => {
         // 카메라 위치 설정
         camera.position.set(15, 15, 15);
         camera.lookAt(0, 0, 0);
+
+        // Add GridHelper
+        const size = 20;  // Grid size
+        const divisions = 20;  // Number of divisions
+        const gridHelper = new THREE.GridHelper(size, divisions);
+        scene.add(gridHelper);
+
+        // Add AxesHelper
+        const axesHelper = new THREE.AxesHelper(5); // Parameter defines the length of the axes
+        scene.add(axesHelper);
 
         // 애니메이션 루프
         function animate() {
