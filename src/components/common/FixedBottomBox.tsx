@@ -17,7 +17,7 @@ const FixedBottomBox = ({ children, isOpen, onClose }: FixedBottomBoxProps) => {
 };
 
 const Container = styled.div<{$isOpen : boolean;}>`
-  display : ${({ $isOpen }) => ($isOpen ? 'block' : 'hidden')};
+  display : ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
   position: fixed;
   bottom: 0;
   left: 0;

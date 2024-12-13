@@ -4,19 +4,19 @@ import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { useCoordinate } from '@/contexts/CoordinateContext';
+import { createDot } from '@/meshes/dot';
 
 const ThreeCanvas: React.FC = () => {
-    const { state, dispatch } = useCoordinate();
+    const { state } = useCoordinate();
+    const {coordinates} = state;
     const mountRef = useRef<HTMLDivElement | null>(null);
 
-    // useEffect(() => {
-    //     if(state) {
-    //         console.log(state.coordinates)
-    //         dispatch({ type: 'CLEAR_COORDINATES' });
-    //     }
-    // }, [state]);
+    const sceneRef = useRef<THREE.Scene>();
+    const cameraRef = useRef<THREE.PerspectiveCamera>();
+    const rendererRef = useRef<THREE.WebGLRenderer>();
+    const controlsRef = useRef<OrbitControls>();
 
-    useEffect(() => { 
+    useEffect(() => {
         // Scene, Camera, Renderer
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -27,30 +27,6 @@ const ThreeCanvas: React.FC = () => {
             mountRef.current.appendChild(renderer.domElement);
         }
         const controls = new OrbitControls( camera, renderer.domElement );
-
-        // 임의의 N개 정점을 생성
-        // const N = 100;
-        // const points = Array.from({ length: N }, () => new THREE.Vector3(
-        //     Math.random() * 10,
-        //     Math.random() * 10,
-        //     Math.random() * 10
-        // ));
-
-        const points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1), new THREE.Vector3(2, 0, 0), new THREE.Vector3(3, 1, 1), new THREE.Vector3(4, 0, 0), new THREE.Vector3(4, 0, 1) ]
-        // Convex Hull 알고리즘을 위한 QuickHull 사용
-        const convexGeometry = new ConvexGeometry(points);
-
-        // Mesh 생성
-        const material = new THREE.MeshBasicMaterial({ color: 0x00aaff, wireframe: true });
-        const mesh = new THREE.Mesh(convexGeometry, material);
-
-        // Mesh를 장면에 추가
-        scene.add(mesh);
-
-        // 카메라 위치 설정
-        camera.position.set(15, 15, 15);
-        camera.lookAt(0, 0, 0);
-
         // Add GridHelper
         const size = 20;  // Grid size
         const divisions = 20;  // Number of divisions
@@ -60,23 +36,53 @@ const ThreeCanvas: React.FC = () => {
         // Add AxesHelper
         const axesHelper = new THREE.AxesHelper(5); // Parameter defines the length of the axes
         scene.add(axesHelper);
-
-        // 애니메이션 루프
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-            controls.update();
-        }
-        animate();
-
-        // Cleanup on component unmount
+        sceneRef.current = scene;
+        cameraRef.current = camera;
+        rendererRef.current = renderer;
+        controlsRef.current = controls;
         return () => {
             if (mountRef.current) {
                 mountRef.current.removeChild(renderer.domElement);
             }
             renderer.dispose();
-        };
-    }, []);
+        }
+    }, [])
+
+    useEffect(() => { 
+        if(mountRef.current) {
+            const scene = sceneRef.current!;
+            const camera = cameraRef.current!;
+            const renderer = rendererRef.current!;
+            const controls = controlsRef.current!;
+    
+            if(coordinates) {
+                const {x, y, z} = coordinates
+                const dot = createDot()
+                dot.position.set(x, y, z)
+                scene.add(dot)
+            }
+
+            // 카메라 위치 설정
+            camera.position.set(15, 15, 15);
+            camera.lookAt(0, 0, 0);
+    
+            // 애니메이션 루프
+            let handleId : any;
+            const animate = ()=>  {
+                handleId = requestAnimationFrame(animate);
+                console.log(scene.children.length)
+                renderer.render(scene, camera);
+                controls.update();
+            }
+            animate();
+    
+            // Cleanup on component unmount
+            return () => {
+                cancelAnimationFrame(handleId)
+            };
+        }
+        
+    }, [coordinates, mountRef.current]);
 
     return <div ref={mountRef} />;
 };

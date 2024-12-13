@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { Coordinate } from '@/types/coordinate';
 
 interface CoordinateState {
-  coordinates: Coordinate[];
+  coordinates: Coordinate | null;
 }
 
 type CoordinateAction = 
@@ -10,7 +10,7 @@ type CoordinateAction =
   | { type: 'CLEAR_COORDINATES' };
 
 const initialState: CoordinateState = {
-  coordinates: []
+  coordinates: null
 };
 
 const CoordinateContext = createContext<{
@@ -23,12 +23,12 @@ function coordinateReducer(state: CoordinateState, action: CoordinateAction): Co
     case 'ADD_COORDINATE':
       return {
         ...state,
-        coordinates: [...state.coordinates, action.payload]
+        coordinates: action.payload
       };
     case 'CLEAR_COORDINATES':
       return {
         ...state,
-        coordinates: []
+        coordinates: null
       };
     default:
       return state;
@@ -37,7 +37,6 @@ function coordinateReducer(state: CoordinateState, action: CoordinateAction): Co
 
 export function CoordinateProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(coordinateReducer, initialState);
-
   return (
     <CoordinateContext.Provider value={{ state, dispatch }}>
       {children}
