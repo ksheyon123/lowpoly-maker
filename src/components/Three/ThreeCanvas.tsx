@@ -3,9 +3,18 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { useCoordinate } from '@/contexts/CoordinateContext';
 
 const ThreeCanvas: React.FC = () => {
+    const { state, dispatch } = useCoordinate();
     const mountRef = useRef<HTMLDivElement | null>(null);
+
+    // useEffect(() => {
+    //     if(state) {
+    //         console.log(state.coordinates)
+    //         dispatch({ type: 'CLEAR_COORDINATES' });
+    //     }
+    // }, [state]);
 
     useEffect(() => { 
         // Scene, Camera, Renderer

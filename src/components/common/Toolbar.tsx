@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaKeyboard } from 'react-icons/fa';
 
 interface ToolbarProps {
   onIconClick: () => void;
@@ -14,12 +14,12 @@ const Toolbar = ({ onIconClick }: ToolbarProps) => {
   };
 
   return (
-    <ToolbarContainer isOpen={isOpen}>
+    <ToolbarContainer>
       <ToggleButton onClick={toggleToolbar}>
         {isOpen ? <FaTimes /> : <FaBars />}
       </ToggleButton>
-      <ToolbarContent isOpen={isOpen}>
-        <button onClick={onIconClick}>아이콘1</button>
+      <ToolbarContent $isOpen={isOpen}>
+        <button onClick={onIconClick}><FaKeyboard /></button>
         <button onClick={onIconClick}>아이콘2</button>
         {/* 여기에 툴바 내용을 추가하세요 */}
       </ToolbarContent>
@@ -27,7 +27,7 @@ const Toolbar = ({ onIconClick }: ToolbarProps) => {
   );
 };
 
-const ToolbarContainer = styled.div<{ isOpen: boolean }>`
+const ToolbarContainer = styled.div`
   position: fixed;
   right: 0;
   top: 50%;
@@ -53,9 +53,9 @@ const ToggleButton = styled.button`
   }
 `;
 
-const ToolbarContent = styled.div<{ isOpen: boolean }>`
+const ToolbarContent = styled.div<{ $isOpen: boolean }>`
   background: #ffffff;
-  width: ${({ isOpen }) => (isOpen ? '60px' : '0')};
+  width: ${({ $isOpen }) => ($isOpen ? '60px' : '0')};
   height: 400px;
   transition: width 0.3s ease-in-out;
   overflow: hidden;

@@ -8,17 +8,16 @@ interface FixedBottomBoxProps {
 }
 
 const FixedBottomBox = ({ children, isOpen, onClose }: FixedBottomBoxProps) => {
-  if (!isOpen) return null;
-
   return (
-    <Container>
+    <Container $isOpen={isOpen}>
       <CloseButton onClick={onClose}>×</CloseButton>
       {children}
     </Container>
   );
 };
 
-const Container = styled.div`
+const Container = styled.div<{$isOpen : boolean;}>`
+  display : ${({ $isOpen }) => ($isOpen ? 'block' : 'hidden')};
   position: fixed;
   bottom: 0;
   left: 0;
