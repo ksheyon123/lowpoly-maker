@@ -8,12 +8,15 @@ import Toolbar from "@/components/common/Toolbar";
 import ThreeCanvas from "@/components/Three/ThreeCanvas";
 import Input from '@/components/common/Input';
 import CoordinateInputForm from '@/components/common/CoordinateInputForm';
+import { ThreeContextProvider } from '@/contexts/ThreeContext';
 
 export default function Home() {
   return (
-    <CoordinateProvider>
-      <HomeContent />
-    </CoordinateProvider>
+    <ThreeContextProvider>
+      <CoordinateProvider>
+        <HomeContent />
+      </CoordinateProvider>
+    </ThreeContextProvider>
   );
 }
 
