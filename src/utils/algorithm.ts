@@ -10,7 +10,7 @@
     QuickHull 알고리즘은 평균적으로 O(n log n)의 시간 복잡도를 가지지만, 최악의 경우 O(n^2)의 시간 복잡도를 가질 수 있습니다. 이는 점들이 특정한 패턴으로 배열되어 있을 때 발생합니다.
     이 알고리즘은 구현이 비교적 간단하고, 직관적으로 이해하기 쉬운 장점이 있습니다.
  */
-const quickHull = (points: [number, number][]) => {
+export const quickHull = (points: [number, number][]) => {
   if (points.length < 3) return points;
 
   // Find the leftmost and rightmost points
@@ -84,13 +84,3 @@ const isLeftOfLine = (
     (p2[0] - p1[0]) * (p[1] - p1[1]) - (p2[1] - p1[1]) * (p[0] - p1[0]) > 0
   );
 };
-
-const points: [number, number][] = [
-  [0, 0],
-  [1, 1],
-  [2, 2],
-  [2, 0],
-  [1, -1],
-  [0, 2],
-];
-const hull = quickHull(points);
