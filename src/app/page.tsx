@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Coordinate } from "@/types/coordinate";
+import { useState } from "react";
 import {
   useCoordinate,
   CoordinateProvider,
@@ -9,11 +8,8 @@ import {
 import FixedBottomBox from "@/components/common/FixedBottomBox";
 import Toolbar from "@/components/common/Toolbar";
 import ThreeCanvas from "@/components/Three/ThreeCanvas";
-import Input from "@/components/common/Input";
 import CoordinateInputForm from "@/components/common/CoordinateInputForm";
 import { ThreeContextProvider } from "@/contexts/ThreeContext";
-import { quickHull } from "@/utils/algorithm";
-import { createDelaunayTriangulation } from "@/utils/twoDimensionalDelaunayTriangulation";
 
 export default function Home() {
   return (
@@ -40,12 +36,6 @@ function HomeContent() {
   const onSubmit = (coordinate: any) => {
     dispatch({ type: "ADD_COORDINATE", payload: coordinate });
   };
-
-  useEffect(() => {
-    const points: { x: number; y: number }[] = [];
-    const d = createDelaunayTriangulation(points);
-    console.log(d);
-  }, []);
 
   return (
     <div>

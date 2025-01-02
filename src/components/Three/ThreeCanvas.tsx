@@ -1,10 +1,14 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry.js";
 import { useCoordinate } from "@/contexts/CoordinateContext";
 import { createDot } from "@/meshes/dot";
 import { useThree } from "@/contexts/ThreeContext";
+import {
+  Point3D,
+  createDelaunayTriangulation3D,
+} from "@/utils/threeDimensionalDelaunayTriangulation";
+import { IPoint3D, ICircumsphere, ITetrahedron } from "@/types";
 
 const ThreeCanvas: React.FC = () => {
   const { state } = useCoordinate();
@@ -30,14 +34,30 @@ const ThreeCanvas: React.FC = () => {
     if (mountRef.current) {
       if (coordinates) {
         const { x, y, z } = coordinates;
-        const dot = createDot();
-        dot.position.set(x, y, z);
-        scene.add(dot);
       }
 
       // 카메라 위치 설정
       camera.position.set(15, 15, 15);
       camera.lookAt(0, 0, 0);
+
+      // 테스트 사용 예시
+      const testPoints3D: IPoint3D[] = [
+        Point3D(0, 0, 0),
+        Point3D(1, 0, 0),
+        Point3D(0, 1, 0),
+        Point3D(0, 0, 1),
+        Point3D(1, 1, 1),
+        Point3D(0.5, 0.5, 0.5),
+      ];
+
+      testPoints3D.forEach(({ x, y, z }) => {
+        const dot = createDot();
+        dot.position.set(x, y, z);
+        scene.add(dot);
+      });
+
+      const triangles = createDelaunayTriangulation3D(testPoints3D);
+      console.log(triangles);
 
       // 애니메이션 루프
       let handleId: any;

@@ -107,19 +107,21 @@ const isSamePoint = (p1: IPoint, p2: IPoint): boolean =>
   p1.x === p2.x && p1.y === p2.y;
 
 // Delaunay Triangulation 메인 함수
-export const createDelaunayTriangulation = (points: IPoint[]): ITriangle[] => {
+const createDelaunayTriangulation = (points: IPoint[]): ITriangle[] => {
   if (points.length < 3) return [];
 
   // 슈퍼 삼각형 생성
   const superTriangle = createSuperTriangle(points);
   let triangles: ITriangle[] = [superTriangle];
 
+  console.log("TRI ANGLES : ", triangles);
   // 각 점에 대해 triangulation 수행
   points.forEach((point) => {
     // 점을 포함하는 삼각형들의 가장자리를 찾음
     const edges = new Set<string>();
 
     triangles = triangles.filter((triangle) => {
+      console.log("triangle : ", triangle);
       if (isPointInCircumcircle(point, triangle)) {
         // 삼각형의 가장자리를 저장
         triangle.points.forEach((p1, i) => {
@@ -156,7 +158,7 @@ export const createDelaunayTriangulation = (points: IPoint[]): ITriangle[] => {
 };
 
 // 테스트 사용 예시
-const testPoints: IPoint[] = [
+const t: IPoint[] = [
   Point(0, 0),
   Point(1, 0),
   Point(0, 1),
@@ -165,7 +167,7 @@ const testPoints: IPoint[] = [
   Point(1.5, 0.5),
 ];
 
-const triangulation = createDelaunayTriangulation(testPoints);
+const triangulation = createDelaunayTriangulation(t);
 
 // 결과 출력을 위한 유틸리티 함수
 const printTriangulation = (triangles: ITriangle[]): void => {
