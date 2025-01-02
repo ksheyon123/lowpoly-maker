@@ -13,6 +13,7 @@ import Input from "@/components/common/Input";
 import CoordinateInputForm from "@/components/common/CoordinateInputForm";
 import { ThreeContextProvider } from "@/contexts/ThreeContext";
 import { quickHull } from "@/utils/algorithm";
+import { createDelaunayTriangulation } from "@/utils/twoDimensionalDelaunayTriangulation";
 
 export default function Home() {
   return (
@@ -41,16 +42,9 @@ function HomeContent() {
   };
 
   useEffect(() => {
-    const points: [number, number][] = [
-      [0, 0],
-      [1, 1],
-      [2, 0],
-      [2, 2],
-      [1, -1],
-      [0, 2],
-    ];
-    const q = quickHull(points);
-    console.log(q);
+    const points: { x: number; y: number }[] = [];
+    const d = createDelaunayTriangulation(points);
+    console.log(d);
   }, []);
 
   return (
