@@ -1,5 +1,5 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 interface FixedBottomBoxProps {
   children: React.ReactNode;
@@ -16,8 +16,8 @@ const FixedBottomBox = ({ children, isOpen, onClose }: FixedBottomBoxProps) => {
   );
 };
 
-const Container = styled.div<{$isOpen : boolean;}>`
-  display : ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
+const Container = styled.div<{ $isOpen: boolean }>`
+  display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
   position: fixed;
   bottom: 0;
   left: 0;
@@ -43,7 +43,7 @@ const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
   }

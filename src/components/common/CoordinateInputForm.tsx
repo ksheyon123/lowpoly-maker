@@ -1,23 +1,25 @@
 // src/components/common/CoordinateInputForm.tsx
-import React, { useState } from 'react';
-import Input from './Input';
+import React, { useState } from "react";
+import Input from "./Input/Input";
 
 interface CoordinateInputFormProps {
   onSubmit: (coordinates: { x: string; y: string; z: string }) => void;
 }
 
-const CoordinateInputForm: React.FC<CoordinateInputFormProps> = ({ onSubmit }) => {
+const CoordinateInputForm: React.FC<CoordinateInputFormProps> = ({
+  onSubmit,
+}) => {
   const [coordinates, setCoordinates] = useState({
-    x: '',
-    y: '',
-    z: '',
+    x: "",
+    y: "",
+    z: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setCoordinates(prev => ({
+    setCoordinates((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -50,7 +52,7 @@ const CoordinateInputForm: React.FC<CoordinateInputFormProps> = ({ onSubmit }) =
           type="number"
         />
       </div>
-      <button 
+      <button
         onClick={handleSubmit}
         className="self-end px-5 py-2 bg-blue-500 text-white rounded-md font-medium hover:bg-blue-600 transition-colors"
       >
