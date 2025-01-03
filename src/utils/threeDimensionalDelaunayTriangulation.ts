@@ -1,3 +1,5 @@
+import { IPoint3D, ICircumsphere, ITetrahedron } from "@/types/index";
+
 /**
  * 3차원 들로네 삼각분할(3D Delaunay Triangulation)은 3차원 공간에서 주어진 점들을 사면체로 분할하는 기법입니다.
  * 주요 특성:
@@ -8,23 +10,6 @@
  * 3. 볼록 껍질(Convex Hull):
  *    - 점 집합의 3차원 볼록 껍질 내부의 모든 공간을 사면체로 채웁니다.
  */
-
-// 기본 타입 정의
-interface IPoint3D {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface ICircumsphere {
-  center: IPoint3D;
-  radius: number;
-}
-
-interface ITetrahedron {
-  points: [IPoint3D, IPoint3D, IPoint3D, IPoint3D];
-  circumsphere: () => ICircumsphere | null;
-}
 
 // [변경] 수치 안정성을 위한 상수 추가
 const EPSILON = 1e-10;
@@ -239,7 +224,9 @@ const triangleFaceToString = (
 };
 
 // 3D Delaunay Triangulation 메인 함수
-const createDelaunayTriangulation3D = (points: IPoint3D[]): ITetrahedron[] => {
+export const createDelaunayTriangulation3D = (
+  points: IPoint3D[]
+): ITetrahedron[] => {
   if (points.length < 4) return [];
 
   // 점들을 정규화
@@ -303,29 +290,29 @@ const createDelaunayTriangulation3D = (points: IPoint3D[]): ITetrahedron[] => {
   );
 };
 
-// 테스트 사용 예시
-const testPoints3D: IPoint3D[] = [
-  { x: 0, y: 0, z: 0 },
-  { x: 1, y: 0, z: 0 },
-  { x: 0, y: 1, z: 0 },
-  { x: 0, y: 0, z: 1 },
-  { x: 1, y: 0, z: 1 },
-  { x: 1, y: 1, z: 1 },
-  { x: 2, y: 1, z: 1 },
-];
+// // 테스트 사용 예시
+// const testPoints3D: IPoint3D[] = [
+//   { x: 0, y: 0, z: 0 },
+//   { x: 1, y: 0, z: 0 },
+//   { x: 0, y: 1, z: 0 },
+//   { x: 0, y: 0, z: 1 },
+//   { x: 1, y: 0, z: 1 },
+//   { x: 1, y: 1, z: 1 },
+//   { x: 2, y: 1, z: 1 },
+// ];
 
-const triangulation3D = createDelaunayTriangulation3D(testPoints3D);
+// const triangulation3D = createDelaunayTriangulation3D(testPoints3D);
 
-// 결과 출력을 위한 유틸리티 함수
-const printTriangulation3D = (tetrahedra: ITetrahedron[]): void => {
-  let rmed: ITetrahedron[] = [];
-  tetrahedra.forEach((tetra, i) => {
-    console.log(`Tetrahedron ${i + 1}:`);
-    tetra.points.forEach((point, j) => {
-      console.log(`  Point ${j + 1}: (${point.x}, ${point.y}, ${point.z})`);
-    });
-  });
-  console.log(`Found ${rmed.length} tetrahedra:`);
-};
+// // 결과 출력을 위한 유틸리티 함수
+// const printTriangulation3D = (tetrahedra: ITetrahedron[]): void => {
+//   let rmed: ITetrahedron[] = [];
+//   tetrahedra.forEach((tetra, i) => {
+//     console.log(`Tetrahedron ${i + 1}:`);
+//     tetra.points.forEach((point, j) => {
+//       console.log(`  Point ${j + 1}: (${point.x}, ${point.y}, ${point.z})`);
+//     });
+//   });
+//   console.log(`Found ${rmed.length} tetrahedra:`);
+// };
 
-printTriangulation3D(triangulation3D);
+// printTriangulation3D(triangulation3D);
