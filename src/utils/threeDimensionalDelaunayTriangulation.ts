@@ -26,6 +26,69 @@ interface ITetrahedron {
   circumsphere: () => ICircumsphere | null;
 }
 
+// [변경] 수치 안정성을 위한 상수 추가
+const EPSILON = 1e-10;
+const MIN_VOLUME = 1e-12;
+
+// [변경] 볼륨 계산 함수 추가
+const calculateVolume = (
+  p1: IPoint3D,
+  p2: IPoint3D,
+  p3: IPoint3D,
+  p4: IPoint3D
+): number => {
+  const v1 = {
+    x: p2.x - p1.x,
+    y: p2.y - p1.y,
+    z: p2.z - p1.z,
+  };
+  const v2 = {
+    x: p3.x - p1.x,
+    y: p3.y - p1.y,
+    z: p3.z - p1.z,
+  };
+  const v3 = {
+    x: p4.x - p1.x,
+    y: p4.y - p1.y,
+    z: p4.z - p1.z,
+  };
+
+  return Math.abs(
+    (v1.x * (v2.y * v3.z - v3.y * v2.z) -
+      v1.y * (v2.x * v3.z - v3.x * v2.z) +
+      v1.z * (v2.x * v3.y - v3.x * v2.y)) /
+      6
+  );
+};
+
+// [변경] 점 정규화 함수 추가
+const normalizePoints = (
+  points: IPoint3D[]
+): [IPoint3D[], (p: IPoint3D) => IPoint3D] => {
+  const minX = Math.min(...points.map((p) => p.x));
+  const minY = Math.min(...points.map((p) => p.y));
+  const minZ = Math.min(...points.map((p) => p.z));
+  const maxX = Math.max(...points.map((p) => p.x));
+  const maxY = Math.max(...points.map((p) => p.y));
+  const maxZ = Math.max(...points.map((p) => p.z));
+
+  const scale = Math.max(maxX - minX, maxY - minY, maxZ - minZ);
+
+  const normalizedPoints = points.map((p) => ({
+    x: (p.x - minX) / scale,
+    y: (p.y - minY) / scale,
+    z: (p.z - minZ) / scale,
+  }));
+
+  const denormalize = (p: IPoint3D): IPoint3D => ({
+    x: p.x * scale + minX,
+    y: p.y * scale + minY,
+    z: p.z * scale + minZ,
+  });
+
+  return [normalizedPoints, denormalize];
+};
+
 // 점 생성 팩토리 함수
 const Point3D = (x: number, y: number, z: number): IPoint3D => ({
   x,
@@ -33,84 +96,94 @@ const Point3D = (x: number, y: number, z: number): IPoint3D => ({
   z,
 });
 
-// 사면체 생성 팩토리 함수
+// [변경] 수정된 Tetrahedron 팩토리 함수
 const Tetrahedron = (
   p1: IPoint3D,
   p2: IPoint3D,
   p3: IPoint3D,
   p4: IPoint3D
-): ITetrahedron => ({
-  points: [p1, p2, p3, p4],
-  circumsphere: (): ICircumsphere | null => {
-    // Matrix coefficients for the sphere equation
-    const a = [
-      [p2.x - p1.x, p2.y - p1.y, p2.z - p1.z],
-      [p3.x - p1.x, p3.y - p1.y, p3.z - p1.z],
-      [p4.x - p1.x, p4.y - p1.y, p4.z - p1.z],
-    ];
+): ITetrahedron | null => {
+  // 볼륨 체크 추가
+  const volume = calculateVolume(p1, p2, p3, p4);
+  if (volume < MIN_VOLUME) {
+    return null;
+  }
 
-    const d = [
-      0.5 *
-        (p2.x * p2.x -
-          p1.x * p1.x +
-          p2.y * p2.y -
-          p1.y * p1.y +
-          p2.z * p2.z -
-          p1.z * p1.z),
-      0.5 *
-        (p3.x * p3.x -
-          p1.x * p1.x +
-          p3.y * p3.y -
-          p1.y * p1.y +
-          p3.z * p3.z -
-          p1.z * p1.z),
-      0.5 *
-        (p4.x * p4.x -
-          p1.x * p1.x +
-          p4.y * p4.y -
-          p1.y * p1.y +
-          p4.z * p4.z -
-          p1.z * p1.z),
-    ];
+  return {
+    points: [p1, p2, p3, p4],
+    circumsphere: (): ICircumsphere | null => {
+      const a = [
+        [p2.x - p1.x, p2.y - p1.y, p2.z - p1.z],
+        [p3.x - p1.x, p3.y - p1.y, p3.z - p1.z],
+        [p4.x - p1.x, p4.y - p1.y, p4.z - p1.z],
+      ];
 
-    // Calculate determinant
-    const det =
-      a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) -
-      a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0]) +
-      a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
+      const d = [
+        0.5 *
+          (p2.x * p2.x -
+            p1.x * p1.x +
+            p2.y * p2.y -
+            p1.y * p1.y +
+            p2.z * p2.z -
+            p1.z * p1.z),
+        0.5 *
+          (p3.x * p3.x -
+            p1.x * p1.x +
+            p3.y * p3.y -
+            p1.y * p1.y +
+            p3.z * p3.z -
+            p1.z * p1.z),
+        0.5 *
+          (p4.x * p4.x -
+            p1.x * p1.x +
+            p4.y * p4.y -
+            p1.y * p1.y +
+            p4.z * p4.z -
+            p1.z * p1.z),
+      ];
 
-    if (Math.abs(det) < Number.EPSILON) return null;
+      const det =
+        a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) -
+        a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0]) +
+        a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
 
-    // Cramer's rule to solve the system
-    const dx =
-      d[0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) -
-      a[0][1] * (d[1] * a[2][2] - a[1][2] * d[2]) +
-      a[0][2] * (d[1] * a[2][1] - a[1][1] * d[2]);
+      if (Math.abs(det) < EPSILON) return null;
 
-    const dy =
-      a[0][0] * (d[1] * a[2][2] - a[1][2] * d[2]) -
-      d[0] * (a[1][0] * a[2][2] - a[1][2] * a[2][0]) +
-      a[0][2] * (a[1][0] * d[2] - d[1] * a[2][0]);
+      // [변경] Cramer's rule with improved numerical stability
+      const dx =
+        d[0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) -
+        a[0][1] * (d[1] * a[2][2] - a[1][2] * d[2]) +
+        a[0][2] * (d[1] * a[2][1] - a[1][1] * d[2]);
 
-    const dz =
-      a[0][0] * (a[1][1] * d[2] - d[1] * a[2][1]) -
-      a[0][1] * (a[1][0] * d[2] - d[1] * a[2][0]) +
-      d[0] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
+      const dy =
+        a[0][0] * (d[1] * a[2][2] - a[1][2] * d[2]) -
+        d[0] * (a[1][0] * a[2][2] - a[1][2] * a[2][0]) +
+        a[0][2] * (a[1][0] * d[2] - d[1] * a[2][0]);
 
-    const center = Point3D(dx / det, dy / det, dz / det);
+      const dz =
+        a[0][0] * (a[1][1] * d[2] - d[1] * a[2][1]) -
+        a[0][1] * (a[1][0] * d[2] - d[1] * a[2][0]) +
+        d[0] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
 
-    const radius = Math.sqrt(
-      Math.pow(center.x - p1.x, 2) +
-        Math.pow(center.y - p1.y, 2) +
-        Math.pow(center.z - p1.z, 2)
-    );
+      const center = {
+        x: dx / det,
+        y: dy / det,
+        z: dz / det,
+      };
 
-    return { center, radius };
-  },
-});
+      const radius = Math.sqrt(
+        Math.pow(center.x - p1.x, 2) +
+          Math.pow(center.y - p1.y, 2) +
+          Math.pow(center.z - p1.z, 2)
+      );
+
+      return { center, radius };
+    },
+  };
+};
 
 // 슈퍼 사면체 생성
-const createSuperTetrahedron = (points: IPoint3D[]): ITetrahedron => {
+const createSuperTetrahedron = (points: IPoint3D[]): ITetrahedron | null => {
   const minX = Math.min(...points.map((p) => p.x));
   const minY = Math.min(...points.map((p) => p.y));
   const minZ = Math.min(...points.map((p) => p.z));
@@ -166,8 +239,14 @@ const triangleFaceToString = (
 const createDelaunayTriangulation3D = (points: IPoint3D[]): ITetrahedron[] => {
   if (points.length < 4) return [];
 
-  // 슈퍼 사면체 생성
-  const superTetrahedron = createSuperTetrahedron(points);
+  // 점들을 정규화
+  const [normalizedPoints, denormalize] = normalizePoints(points);
+
+  // 슈퍼 사면체 생성 (정규화된 좌표계에서)
+  const superTetrahedron = createSuperTetrahedron(normalizedPoints);
+
+  if (!superTetrahedron) return [];
+
   let tetrahedra: ITetrahedron[] = [superTetrahedron];
 
   // 각 점에 대해 triangulation 수행
@@ -199,14 +278,17 @@ const createDelaunayTriangulation3D = (points: IPoint3D[]): ITetrahedron[] => {
       return true;
     });
 
-    // 새로운 사면체 생성
+    // 새로운 사면체 생성 시 볼륨 체크
     Array.from(faces).forEach((faceStr) => {
       const [p1, p2, p3] = JSON.parse(faceStr) as [
         IPoint3D,
         IPoint3D,
         IPoint3D
       ];
-      tetrahedra.push(Tetrahedron(p1, p2, p3, point));
+      const newTetra = Tetrahedron(p1, p2, p3, point);
+      if (newTetra) {
+        tetrahedra.push(newTetra);
+      }
     });
   });
 
@@ -227,6 +309,7 @@ const testPoints3D: IPoint3D[] = [
   { x: 0, y: 0, z: 1 },
   { x: 1, y: 0, z: 1 },
   { x: 1, y: 1, z: 1 },
+  { x: 2, y: 1, z: 1 },
 ];
 
 const triangulation3D = createDelaunayTriangulation3D(testPoints3D);
@@ -234,25 +317,13 @@ const triangulation3D = createDelaunayTriangulation3D(testPoints3D);
 // 결과 출력을 위한 유틸리티 함수
 const printTriangulation3D = (tetrahedra: ITetrahedron[]): void => {
   let rmed: ITetrahedron[] = [];
-  let i = 0;
-  tetrahedra.forEach((tetra) => {
-    if (
-      !(
-        tetra.points.every(({ x, y, z }, _, arr) => x === arr[0].x) ||
-        tetra.points.every(({ x, y, z }, _, arr) => y === arr[0].y) ||
-        tetra.points.every(({ x, y, z }, _, arr) => z === arr[0].z)
-      )
-    ) {
-      console.log(`Tetrahedron ${i + 1}:`);
-      tetra.points.forEach((point, j) => {
-        console.log(`  Point ${j + 1}: (${point.x}, ${point.y}, ${point.z})`);
-      });
-      rmed.push(tetra);
-      i++;
-    }
+  tetrahedra.forEach((tetra, i) => {
+    console.log(`Tetrahedron ${i + 1}:`);
+    tetra.points.forEach((point, j) => {
+      console.log(`  Point ${j + 1}: (${point.x}, ${point.y}, ${point.z})`);
+    });
   });
   console.log(`Found ${rmed.length} tetrahedra:`);
-  console.log(rmed);
 };
 
 printTriangulation3D(triangulation3D);
