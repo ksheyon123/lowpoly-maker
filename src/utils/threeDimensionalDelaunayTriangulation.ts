@@ -112,12 +112,15 @@ const Tetrahedron = (
   return {
     points: [p1, p2, p3, p4],
     circumsphere: (): ICircumsphere | null => {
+      // 행렬식 계산을 위한 벡터들
       const a = [
-        [p2.x - p1.x, p2.y - p1.y, p2.z - p1.z],
-        [p3.x - p1.x, p3.y - p1.y, p3.z - p1.z],
-        [p4.x - p1.x, p4.y - p1.y, p4.z - p1.z],
+        [p2.x - p1.x, p2.y - p1.y, p2.z - p1.z], // p1에서 p2로 가는 벡터
+        [p3.x - p1.x, p3.y - p1.y, p3.z - p1.z], // p1에서 p3로 가는 벡터
+        [p4.x - p1.x, p4.y - p1.y, p4.z - p1.z], // p1에서 p4로 가는 벡터
       ];
-
+      // 우변 벡터 계산
+      // 각 행은 p1과 다른 점들(p2, p3, p4) 사이의 제곱 거리 차이를 계산합니다
+      // 0.5를 곱하는 것은 연립방정식을 단순화하기 위한 것입니다
       const d = [
         0.5 *
           (p2.x * p2.x -
@@ -244,7 +247,6 @@ const createDelaunayTriangulation3D = (points: IPoint3D[]): ITetrahedron[] => {
 
   // 슈퍼 사면체 생성 (정규화된 좌표계에서)
   const superTetrahedron = createSuperTetrahedron(normalizedPoints);
-
   if (!superTetrahedron) return [];
 
   let tetrahedra: ITetrahedron[] = [superTetrahedron];
