@@ -156,7 +156,16 @@ export const handleKeyDown = (gamePad: GamePad, key: string): GamePad => {
 
 // 키보드 릴리즈 이벤트 처리 함수
 export const handleKeyUp = (gamePad: GamePad, key: string): GamePad => {
-  const updatedButtons = gamePad.buttons.map((button) => ({
+  const { stick, buttons } = gamePad;
+
+  let updatedStick = { ...stick };
+  updatedStick.position.x = stick.basePosition.x;
+  updatedStick.position.y = stick.basePosition.y;
+
+  updatedStick.mesh.position.x = stick.basePosition.x;
+  updatedStick.mesh.position.y = stick.basePosition.y;
+
+  const updatedButtons = buttons.map((button) => ({
     ...button,
     isPressed: false,
     mesh: (() => {
@@ -168,6 +177,7 @@ export const handleKeyUp = (gamePad: GamePad, key: string): GamePad => {
   return {
     ...gamePad,
     buttons: updatedButtons,
+    stick: updatedStick,
   };
 };
 

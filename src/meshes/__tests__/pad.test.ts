@@ -125,6 +125,20 @@ describe("GamePad Controller", () => {
   });
 
   describe("handleKeyUp", () => {
+    it("should reset stick state on key up", () => {
+      const gamePad = initGamePad(scene);
+      let updatedGamePad = handleKeyDown(gamePad, "ArrowUp");
+      expect(updatedGamePad.stick.position.y).toBeGreaterThan(0);
+
+      updatedGamePad = handleKeyUp(updatedGamePad, "ArrowUp");
+      expect(updatedGamePad.stick.position.x).toBe(
+        updatedGamePad.stick.basePosition.x
+      );
+      expect(updatedGamePad.stick.position.y).toBe(
+        updatedGamePad.stick.basePosition.y
+      );
+    });
+
     it("should reset button state on key up", () => {
       const gamePad = initGamePad(scene);
       let updatedGamePad = handleKeyDown(gamePad, "a");
