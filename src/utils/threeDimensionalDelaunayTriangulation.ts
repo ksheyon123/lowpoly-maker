@@ -75,7 +75,7 @@ const normalizePoints = (
 };
 
 // 점 생성 팩토리 함수
-const Point3D = (x: number, y: number, z: number): IPoint3D => ({
+export const Point3D = (x: number, y: number, z: number): IPoint3D => ({
   x,
   y,
   z,
