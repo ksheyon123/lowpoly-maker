@@ -8,7 +8,12 @@ import {
   Point3D,
   createDelaunayTriangulation3D,
 } from "@/utils/threeDimensionalDelaunayTriangulation";
-import { IPoint3D, ICircumsphere, ITetrahedron } from "@/types";
+import { IPoint3D, ICircumsphere, ITetrahedron, IPoint } from "@/types";
+import {
+  createDelaunayTriangulation,
+  Point,
+} from "@/utils/twoDimensionalDelaunayTriangulation";
+import { createDelaunayTriangleIndex } from "@/utils/delaunayTriangulationIndexer";
 
 const ThreeCanvas: React.FC = () => {
   const { state } = useCoordinate();
@@ -41,24 +46,37 @@ const ThreeCanvas: React.FC = () => {
       camera.lookAt(0, 0, 0);
 
       // 테스트 사용 예시
-      const testPoints3D: IPoint3D[] = [
-        Point3D(0, 0, 0),
-        Point3D(1, 0, 0),
-        Point3D(0, 1, 0),
-        Point3D(0, 0, 1),
-        Point3D(1, 1, 1),
-        Point3D(0.5, 0.5, 0.5),
+      const testPoints: IPoint[] = [
+        Point(0, 0),
+        Point(1, 0),
+        Point(0, 1),
+        Point(1, 1),
       ];
 
-      testPoints3D.forEach(({ x, y, z }) => {
+      testPoints.forEach(({ x, y }) => {
         const dot = createDot();
-        dot.position.set(x, y, z);
+        dot.position.set(x, y, 0);
         scene.add(dot);
       });
 
-      const triangles = createDelaunayTriangulation3D(testPoints3D);
-      console.log(triangles);
+      const triangles = createDelaunayTriangulation(testPoints);
+      const { indices, vertices } = createDelaunayTriangleIndex(triangles);
 
+      const bufferGeometry = new THREE.BufferGeometry();
+      bufferGeometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(vertices, 3)
+      );
+      bufferGeometry.setIndex(indices);
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x156289,
+        side: THREE.DoubleSide,
+        flatShading: true,
+        transparent: true,
+        opacity: 0.8,
+      });
+      const mesh = new THREE.Mesh(bufferGeometry, material);
+      scene.add(mesh);
       // 애니메이션 루프
       let handleId: any;
       const animate = () => {

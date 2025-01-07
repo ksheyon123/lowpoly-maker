@@ -289,30 +289,3 @@ export const createDelaunayTriangulation3D = (
       )
   );
 };
-
-// // 테스트 사용 예시
-// const testPoints3D: IPoint3D[] = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 1, y: 0, z: 0 },
-//   { x: 0, y: 1, z: 0 },
-//   { x: 0, y: 0, z: 1 },
-//   { x: 1, y: 0, z: 1 },
-//   { x: 1, y: 1, z: 1 },
-//   { x: 2, y: 1, z: 1 },
-// ];
-
-// const triangulation3D = createDelaunayTriangulation3D(testPoints3D);
-
-// // 결과 출력을 위한 유틸리티 함수
-// const printTriangulation3D = (tetrahedra: ITetrahedron[]): void => {
-//   let rmed: ITetrahedron[] = [];
-//   tetrahedra.forEach((tetra, i) => {
-//     console.log(`Tetrahedron ${i + 1}:`);
-//     tetra.points.forEach((point, j) => {
-//       console.log(`  Point ${j + 1}: (${point.x}, ${point.y}, ${point.z})`);
-//     });
-//   });
-//   console.log(`Found ${rmed.length} tetrahedra:`);
-// };
-
-// printTriangulation3D(triangulation3D);

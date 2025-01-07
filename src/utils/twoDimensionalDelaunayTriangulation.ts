@@ -1,3 +1,5 @@
+import { IPoint, ICircumcircle, ITriangle } from "@/types/index";
+
 /**
  * @description 들로네 삼각분할(Delaunay Triangulation)**은 2차원 평면에 주어진 점 집합에서 삼각형들을 구성하는 기법 중 하나로, 다음과 같은 성질을 만족합니다:
  * 1. 원 외접성 (Circumcircle Property):
@@ -7,27 +9,12 @@
  * 3. 볼록 껍질(Convex Hull) 포함:
  * 점 집합의 볼록 껍질(convex hull) 내부에 있는 모든 삼각형을 포함합니다.
  */
-// 기본 타입 정의
-interface IPoint {
-  x: number;
-  y: number;
-}
-
-interface ICircumcircle {
-  center: IPoint;
-  radius: number;
-}
-
-interface ITriangle {
-  points: [IPoint, IPoint, IPoint];
-  circumcircle: () => ICircumcircle | null;
-}
 
 // 점 생성 팩토리 함수
-const Point = (x: number, y: number): IPoint => ({ x, y });
+export const Point = (x: number, y: number): IPoint => ({ x, y });
 
 // 삼각형 생성 팩토리 함수
-const Triangle = (p1: IPoint, p2: IPoint, p3: IPoint): ITriangle => ({
+export const Triangle = (p1: IPoint, p2: IPoint, p3: IPoint): ITriangle => ({
   points: [p1, p2, p3],
   circumcircle: (): ICircumcircle | null => {
     const [a, b, c] = [p1, p2, p3];
@@ -57,7 +44,7 @@ const Triangle = (p1: IPoint, p2: IPoint, p3: IPoint): ITriangle => ({
 });
 
 // 슈퍼 삼각형 생성
-const createSuperTriangle = (points: IPoint[]): ITriangle => {
+export const createSuperTriangle = (points: IPoint[]): ITriangle => {
   const minX = Math.min(...points.map((p) => p.x));
   const minY = Math.min(...points.map((p) => p.y));
   const maxX = Math.max(...points.map((p) => p.x));
@@ -74,7 +61,10 @@ const createSuperTriangle = (points: IPoint[]): ITriangle => {
 };
 
 // 점이 삼각형 내부에 있는지 확인
-const isPointInTriangle = (point: IPoint, triangle: ITriangle): boolean => {
+export const isPointInTriangle = (
+  point: IPoint,
+  triangle: ITriangle
+): boolean => {
   const [a, b, c] = triangle.points;
 
   const area =
@@ -92,7 +82,10 @@ const isPointInTriangle = (point: IPoint, triangle: ITriangle): boolean => {
 };
 
 // 점이 외접원 내부에 있는지 확인
-const isPointInCircumcircle = (point: IPoint, triangle: ITriangle): boolean => {
+export const isPointInCircumcircle = (
+  point: IPoint,
+  triangle: ITriangle
+): boolean => {
   const circumcircle = triangle.circumcircle();
   if (!circumcircle) return false;
 
@@ -103,25 +96,23 @@ const isPointInCircumcircle = (point: IPoint, triangle: ITriangle): boolean => {
 };
 
 // 두 점이 동일한지 확인하는 유틸리티 함수
-const isSamePoint = (p1: IPoint, p2: IPoint): boolean =>
+export const isSamePoint = (p1: IPoint, p2: IPoint): boolean =>
   p1.x === p2.x && p1.y === p2.y;
 
 // Delaunay Triangulation 메인 함수
-const createDelaunayTriangulation = (points: IPoint[]): ITriangle[] => {
+export const createDelaunayTriangulation = (points: IPoint[]): ITriangle[] => {
   if (points.length < 3) return [];
 
   // 슈퍼 삼각형 생성
   const superTriangle = createSuperTriangle(points);
   let triangles: ITriangle[] = [superTriangle];
 
-  console.log("TRI ANGLES : ", triangles);
   // 각 점에 대해 triangulation 수행
   points.forEach((point) => {
     // 점을 포함하는 삼각형들의 가장자리를 찾음
     const edges = new Set<string>();
 
     triangles = triangles.filter((triangle) => {
-      console.log("triangle : ", triangle);
       if (isPointInCircumcircle(point, triangle)) {
         // 삼각형의 가장자리를 저장
         triangle.points.forEach((p1, i) => {
@@ -156,29 +147,3 @@ const createDelaunayTriangulation = (points: IPoint[]): ITriangle[] => {
       )
   );
 };
-
-// 테스트 사용 예시
-const t: IPoint[] = [
-  Point(0, 0),
-  Point(1, 0),
-  Point(0, 1),
-  Point(1, 1),
-  Point(0.5, 0.5),
-  Point(1.5, 0.5),
-];
-
-const triangulation = createDelaunayTriangulation(t);
-
-// 결과 출력을 위한 유틸리티 함수
-const printTriangulation = (triangles: ITriangle[]): void => {
-  console.log(`Found ${triangles.length} triangles:`);
-  triangles.forEach((triangle, i) => {
-    console.log(`Triangle ${i + 1}:`);
-    triangle.points.forEach((point, j) => {
-      console.log(`  Point ${j + 1}: (${point.x}, ${point.y})`);
-    });
-  });
-};
-
-// 결과 출력
-printTriangulation(triangulation);
