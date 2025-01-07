@@ -5,11 +5,11 @@ import {
   useCoordinate,
   CoordinateProvider,
 } from "@/contexts/CoordinateContext";
+import { ThreeContextProvider } from "@/contexts/ThreeContext";
 import FixedBottomBox from "@/components/common/FixedBottomBox";
 import Toolbar from "@/components/common/Toolbar";
 import ThreeCanvas from "@/components/Three/ThreeCanvas";
 import CoordinateInputForm from "@/components/common/CoordinateInputForm";
-import { ThreeContextProvider } from "@/contexts/ThreeContext";
 
 export default function Home() {
   return (
