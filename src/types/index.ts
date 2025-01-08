@@ -36,3 +36,9 @@ export interface IDelaunayResult {
   vertices: number[]; // [x1, y1, z1, x2, y2, z2, ...]
   indices: number[]; // [i1, i2, i3, i4, i5, i6, ...]
 }
+
+// 추가: 제약 조건을 위한 인터페이스
+export interface IConstraint {
+  start: IPoint;
+  end: IPoint;
+}

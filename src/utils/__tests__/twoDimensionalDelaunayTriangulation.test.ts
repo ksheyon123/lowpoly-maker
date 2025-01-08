@@ -46,13 +46,13 @@ describe("Delaunay Triangulation", () => {
   test("기본 사각형 케이스 테스트", () => {
     const points = [Point(0, 0), Point(1, 0), Point(0, 1), Point(1, 1)];
 
-    const triangulation = createDelaunayTriangulation(points);
+    const triangulation = createDelaunayTriangulation(points, []);
     expect(triangulation.length).toBe(2); // 사각형은 2개의 삼각형으로 분할되어야 함
   });
 
   test("삼각형이 3개 미만의 점으로는 생성되지 않아야 함", () => {
     const points = [Point(0, 0), Point(1, 1)];
-    const triangulation = createDelaunayTriangulation(points);
+    const triangulation = createDelaunayTriangulation(points, []);
 
     expect(triangulation.length).toBe(0);
   });
@@ -66,7 +66,7 @@ describe("Delaunay Triangulation", () => {
       Point(0.5, 0.5),
     ];
 
-    const triangulation = createDelaunayTriangulation(points);
+    const triangulation = createDelaunayTriangulation(points, []);
 
     triangulation.forEach((triangle) => {
       expect(isDelaunayValid(triangle, points)).toBe(true);
@@ -76,7 +76,7 @@ describe("Delaunay Triangulation", () => {
   test("모든 삼각형의 넓이 합이 전체 영역과 같아야 함", () => {
     const points = [Point(0, 0), Point(2, 0), Point(2, 2), Point(0, 2)];
 
-    const triangulation = createDelaunayTriangulation(points);
+    const triangulation = createDelaunayTriangulation(points, []);
 
     const totalArea = triangulation.reduce((sum, triangle) => {
       const [p1, p2, p3] = triangle.points;
@@ -95,7 +95,7 @@ describe("Delaunay Triangulation", () => {
       Point(0.5, 0.5),
     ];
 
-    const triangulation = createDelaunayTriangulation(points);
+    const triangulation = createDelaunayTriangulation(points, []);
 
     // 모든 삼각형의 최소 각도가 일정 임계값 이상이어야 함
     triangulation.forEach((triangle) => {
@@ -122,5 +122,29 @@ describe("Delaunay Triangulation", () => {
 
     expect(isPointInTriangle(Point(0.5, 0.5), triangle)).toBe(true);
     expect(isPointInTriangle(Point(1.5, 1.5), triangle)).toBe(false);
+  });
+
+  test("CDT", () => {
+    const points = [
+      Point(0, 0),
+      Point(1, 0),
+      Point(2, 0),
+      Point(0, 1),
+      Point(1, 1),
+      Point(2, 1),
+      Point(0, 2),
+      Point(1, 2),
+      Point(2, 2),
+    ];
+
+    const constraints = [
+      { start: Point(1, 0), end: Point(1, 1) },
+      { start: Point(0, 1), end: Point(1, 1) },
+      { start: Point(1, 2), end: Point(1, 1) },
+      { start: Point(2, 1), end: Point(1, 1) },
+    ];
+
+    const triangulation = createDelaunayTriangulation(points, constraints);
+    expect(triangulation.length).toBe(4);
   });
 });
