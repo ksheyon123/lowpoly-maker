@@ -3,6 +3,7 @@ import {
   isSamePoint,
   isPointInCircumcircle,
   isPointInTriangle,
+  createConstrainedDelaunayTriangulation,
   Triangle,
   createDelaunayTriangulation,
 } from "@/utils/twoDimensionalDelaunayTriangulation";
@@ -130,21 +131,19 @@ describe("Delaunay Triangulation", () => {
       Point(1, 0),
       Point(2, 0),
       Point(0, 1),
-      Point(1, 1),
       Point(2, 1),
       Point(0, 2),
       Point(1, 2),
       Point(2, 2),
     ];
 
-    const constraints = [
-      { start: Point(1, 0), end: Point(1, 1) },
-      { start: Point(0, 1), end: Point(1, 1) },
-      { start: Point(1, 2), end: Point(1, 1) },
-      { start: Point(2, 1), end: Point(1, 1) },
-    ];
+    const constraints = [{ start: Point(1, 0), end: Point(1, 2) }];
 
-    const triangulation = createDelaunayTriangulation(points, constraints);
+    const triangulation = createConstrainedDelaunayTriangulation(
+      points,
+      constraints
+    );
+    console.log(triangulation.map((el) => el.points));
     expect(triangulation.length).toBe(4);
   });
 });
